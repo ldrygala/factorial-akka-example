@@ -16,12 +16,12 @@ class FactorialMasterScala extends Actor {
 
 
   def distributeWork: Actor.Receive = {
-    case fs: CalculateFactorial => {
+    case calculateFactorial: CalculateFactorial => {
       start = Some(System.currentTimeMillis())
       principal = Some(sender())
-      val multiplyRanges = createMultiplyRanges(fs)
+      val multiplyRanges = createMultiplyRanges(calculateFactorial)
       multiplyRanges.foreach { multiplyRange =>
-        val worker = context.actorOf(Props[FactorialWorkerJava])
+        val worker = context.actorOf(Props[FactorialWorkerScala])
         worker ! multiplyRange
         numbersOfWorkers += 1
       }
