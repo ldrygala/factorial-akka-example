@@ -22,12 +22,12 @@ class FactorialAkkaSpec
     master.underlyingActor.numbersOfWorkers shouldBe 5
   }
 
-  it should "calculate factorial correctly" in {
+  it should "calculate factorial" in {
     val master = TestActorRef[FactorialMasterScala](Props[FactorialMasterScala])
     master ! CalculateFactorial(5, 1)
-    within(2 seconds) {
+    awaitAssert ({
       master.underlyingActor.factorial shouldBe 120
-    }
+    }, 2.seconds)
   }
   it should "reply with calculated factorial" in {
     val master = system.actorOf(Props[FactorialMasterScala])
