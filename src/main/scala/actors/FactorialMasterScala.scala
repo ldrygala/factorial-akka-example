@@ -35,6 +35,7 @@ class FactorialMasterScala extends Actor {
       factorial = factorial * tmpResult
       if (numbersOfWorkers == 0) {
         principal.map(c => c ! CalculateResult(factorial, start.map(System.currentTimeMillis() - _).getOrElse(0L)))
+        context.unbecome()
       }
     }
   }

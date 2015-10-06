@@ -7,13 +7,14 @@ import akka.japi.Procedure;
 import messages.CalculateFactorial;
 import messages.CalculationResult;
 import messages.MultiplyRange;
+import utils.FactorialUtils;
 
 import java.math.BigInteger;
 import java.util.List;
 
 public class FactorialMasterJava extends UntypedActor {
-        private int numbersOfWorkers = 0;
-        private BigInteger factorial = BigInteger.ONE;
+        public int numbersOfWorkers = 0;
+        public BigInteger factorial = BigInteger.ONE;
         private long startTime;
         private ActorRef principal;
 
@@ -26,6 +27,7 @@ public class FactorialMasterJava extends UntypedActor {
                     numbersOfWorkers--;
                     if (numbersOfWorkers == 0) {
                         principal.tell(new CalculationResult(factorial, (System.currentTimeMillis() - startTime)), getSelf());
+                        getContext().unbecome();
                     }
                 } else {
                     unhandled(message);
@@ -42,7 +44,7 @@ public class FactorialMasterJava extends UntypedActor {
         public void distributeWork(Object message) {
             if (message instanceof CalculateFactorial) {
                 principal = getSender();
-                List<MultiplyRange> factorials = utils.FactorialUtils.createMultiplyRanges(CalculateFactorial.class.cast(message));
+                List<MultiplyRange> factorials = FactorialUtils.createMultiplyRanges(CalculateFactorial.class.cast(message));
                 for (MultiplyRange factorialRange : factorials) {
                     ActorRef worker = context().actorOf(Props.create(FactorialWorkerJava.class));
                     worker.tell(factorialRange, self());
